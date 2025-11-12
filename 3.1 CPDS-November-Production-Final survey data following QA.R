@@ -227,7 +227,6 @@ production_raised_ITL225 <- production_raised_ITL225 %>%
   )
 
 
-
 Final_results <- production_raised_ITL225 %>%
   mutate(
     Area = census_area,
