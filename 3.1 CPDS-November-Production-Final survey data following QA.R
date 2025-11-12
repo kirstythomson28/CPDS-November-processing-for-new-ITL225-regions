@@ -130,31 +130,37 @@ Survey_results_ITL225 <- Final_survey_results %>%
   filter(!is.na(Area), !is.na(Production)) %>%
   group_by(Crop, Region) %>%
   summarise(
-    total_area = sum(Area, na.rm = TRUE),
+    `Number of returns` = n(),
+    survey_area = sum(Area, na.rm = TRUE),
     total_production = sum(Production, na.rm = TRUE),
-    yield = total_production / total_area,
+    yield = total_production / survey_area,
     .groups = "drop"
-  )
+  )%>%
+  mutate(CropGeneral = word(Crop, 1))
+
 
 Survey_results_Scotland <- Final_survey_results %>%
   filter(!is.na(Area), !is.na(Production)) %>%
   group_by(Crop) %>%
   summarise(
-    total_area = sum(Area, na.rm = TRUE),
+    `Number of returns` = n(),
+    survey_area = sum(Area, na.rm = TRUE),
     total_production = sum(Production, na.rm = TRUE),
-    yield = total_production / total_area,
+    yield = total_production / survey_area,
     .groups = "drop"
   )  %>%
   mutate(Region = "Scotland") %>% 
-  relocate(Region, .after = Crop)
+  relocate(Region, .after = Crop)%>%
+  mutate(CropGeneral = word(Crop, 1))
 
 Survey_results_Scotland_CropGeneral <- Final_survey_results %>%
   filter(!is.na(Area), !is.na(Production)) %>%
   group_by(CropGeneral) %>%
   summarise(
-    total_area = sum(Area, na.rm = TRUE),
+    `Number of returns` = n(),
+    survey_area = sum(Area, na.rm = TRUE),
     total_production = sum(Production, na.rm = TRUE),
-    yield = total_production / total_area,
+    yield = total_production / survey_area,
     .groups = "drop"
   ) %>%
   mutate(Region = "Scotland") %>% 
@@ -165,9 +171,10 @@ total_cereals <- Final_survey_results %>%
          !is.na(Area), !is.na(Production)) %>%
   summarise(
     CropGeneral = "Total_cereals",
-    total_area = sum(Area, na.rm = TRUE),
+    `Number of returns` = n(),
+    survey_area = sum(Area, na.rm = TRUE),
     total_production = sum(Production, na.rm = TRUE),
-    yield = total_production / total_area
+    yield = total_production / survey_area
   ) %>%
   mutate(Region = "Scotland") %>% 
   relocate(Region, .after = CropGeneral)
@@ -176,8 +183,61 @@ Survey_results_Scotland_CropGeneral <- bind_rows(
   Survey_results_Scotland_CropGeneral,
   total_cereals
   ) %>% 
-  rename(Crop = CropGeneral)
+  rename(Crop = CropGeneral)%>%
+  mutate(CropGeneral = word(Crop, 1))
+
+Survey_results_combined <- bind_rows(
+  Survey_results_ITL225,
+  Survey_results_Scotland,
+  Survey_results_Scotland_CropGeneral
+  ) %>%
+  group_by(Region, Crop, CropGeneral) %>%
+  slice(1) %>%
+  ungroup()
+
 
 ################################################################################
+
+census <- june_census %>% 
+  rename(census_area = "Area") %>% 
+  mutate(source = "census")%>%
+  mutate(Region = if_else(str_starts(Region, "M"),
+                          paste0("TL", Region),
+                          Region))%>% 
+  select(Region, Crop, CropGeneral, census_area, `Number of holdings`)
+
+
+production_raised_ITL225 <- Survey_results_combined %>%
+  left_join(census, by = c("Region", "Crop","CropGeneral")) %>% 
+  relocate(CropGeneral, .after = Crop) %>% 
+  relocate(census_area, .after = survey_area)
+
+
+# Step 1: Create a lookup table of Scotland yields by Crop
+scotland_yields <- production_raised_ITL225 %>%
+  filter(Region == "Scotland") %>%
+  select(Crop, CropGeneral, yield_scotland = yield)
+
+# Step 2: Join Scotland yields to all rows
+production_raised_ITL225 <- production_raised_ITL225 %>%
+  left_join(scotland_yields, by = c("Crop", "CropGeneral")) %>%
+  mutate(
+    raised_yield = if_else(`Number of returns` < 5, yield_scotland, yield),
+    production_raised = raised_yield * census_area
+  )
+
+
+
+Final_results <- production_raised_ITL225 %>%
+  mutate(
+    Area = census_area,
+    Production = production_raised,
+    Yield = Production / Area
+  ) %>%
+  select(Region, Crop, CropGeneral, Area, Production, Yield) %>%
+  distinct(Region, Crop, CropGeneral, .keep_all = TRUE)
+
+
+
 
 
