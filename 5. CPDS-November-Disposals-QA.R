@@ -58,19 +58,15 @@ View(Disposals_QA_with_issues)
 
 #export xlsx
 # filename appropriate for data upload to erdm
-str4 <- "Cereal Production and Disposal Survey - 2024-25 - Disposals - July - "
-str5 <- " - Data - Raw Data - QA - June Disposals requiring QA - "
-str6 <- ".csv"
-outputname <- paste(
-  str4, 
-  format(Sys.Date(), format="%Y"), 
-  str5, 
-  format(Sys.time(), format="%d %B"), 
-  str6, 
+str8 <- "November - Data - Raw Data - QA - November Disposals requiring QA - "
+outputname4 <- paste(
+  crop_year, 
+  str8, 
+  format(Sys.Date(), format="%d %B"), 
+  str3, 
   sep = "") 
 
-write.csv(Disposals_QA_with_issues, outputname, row.names = FALSE)
-
+write.csv(Disposals_QA_with_issues, outputname4, row.names = FALSE)
 
 
 ## Data set to be used in mail merge for stock mismatch.
@@ -96,14 +92,11 @@ Qa_emails <- data %>%
 
 #export xlsx
 # filename appropriate for data upload to erdm
-str4 <- "Cereal Production and Disposal Survey - 2024-25 - Disposals - July - "
-str5 <- " - Data - Raw Data - QA - Emails for stock mis match - "
-str6 <- ".csv"
-outputname <- paste(
-  str4,
-  format(Sys.Date(), format="%Y"),
-  str5,
-  format(Sys.time(), format="%d %B"),
-  str6,
+str9 <- "November - Data - Raw Data - QA - Emails for stock mis match - "
+outputname5 <- paste(
+  crop_year,
+  str8,
+  format(Sys.Date(), format="%d %B"), 
+  str3,
   sep = "")
-write.csv(Qa_emails, outputname, row.names = FALSE)
+write.csv(Qa_emails, outputname5, row.names = FALSE)
