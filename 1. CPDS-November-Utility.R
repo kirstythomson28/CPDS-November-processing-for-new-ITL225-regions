@@ -11,7 +11,7 @@ library(glue)
 crop_year <- "2025-26"
 
 #load in main cereal sample csv
-Sample<-read_csv("Cereal Production and Disposal Survey - 2025-26 - Production - Materials - Sample - Main_sample_2025 - Excludes test farms.csv")
+Sample<-read_csv("2025-26 - Production - Materials - Sample - Main_sample_2025 - Excludes test farms.csv")
 
 #load in raw cereal survey data tsv from "all cereal forms" export
 df_raw <- read_tsv("QuickStatsExtract 680 All (5).tsv") 

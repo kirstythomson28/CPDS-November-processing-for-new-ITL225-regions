@@ -148,20 +148,17 @@ Sample$CPH <- paste(Sample$parish, Sample$holding, sep="/")
 Sample_2<- Sample %>% relocate(CPH)
 
 #Use Sample2 (created from sample with CPH formed) to extract NUTS2 and CPH
-Sample.NUTS2<-subset(Sample, select=c(CPH, NUTS2))
+Sample.ITL225<-subset(Sample_2, select=c(CPH, ITL225CD,ITL225NM))
 
 #Join the data frames
-joined_all <- left_join(Crops_all,Sample.NUTS2, by ="CPH" )%>%
+joined_all <- left_join(Crops_all,Sample.ITL225, by ="CPH" )%>%
   mutate(Wholecrop = case_when(Whole_cropped == 1 ~ 'YES',
                                Whole_cropped == 2 ~ 'NO'))%>%
-  mutate(Region = case_when(NUTS2 == 1 ~ 'UKM5',
-                            NUTS2 == 2 ~ 'UKM7',
-                            NUTS2 == 3 ~ 'UKM9',
-                            NUTS2 == 4 ~ 'UKM6',
-                            NUTS2 == 5 ~ 'UKM8')) %>% 
+  mutate(Region = ITL225CD)%>% 
   relocate(CPH, parish, holding, Region, Crop, Area, Production, Moisture_content, #move order
-           Wholecrop, Whole_cropped, NUTS2) %>% 
-  filter(Area>0) #remove records generated with no area
+           Wholecrop, Whole_cropped) %>% 
+  filter(Area>0) %>% #remove records generated with no area
+  select(-Whole_cropped)
 
 wholecropped <- joined_all %>%
   filter(Wholecrop == "YES") %>%
