@@ -58,3 +58,4 @@ rsconnect/
 *.sas7bdat
 *.csv
 *.tsv
+*.svg

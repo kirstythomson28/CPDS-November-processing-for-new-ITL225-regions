@@ -48,7 +48,8 @@ QA_production_nov <- joined_all %>%
       Crop == "Oilseed Rape S" ~ "Spring oilseed rape",
       Crop == "Oilseed Rape W" ~ "Winter oilseed rape",
       TRUE ~ Crop
-    ))
+    )) %>% 
+  select(-c(CPH_part1,CPH_part2))
 
 QA_production_nov <- left_join(
   QA_production_nov,
@@ -70,7 +71,7 @@ outputname <- paste(
 write_xlsx(QA_production_nov, outputname)
 
 ###############################################################################
-# Attempting to recreat outliers identifcation like in excel 
+# Attempting to recreate outliers identification like in excel 
 plot_yield_spread <- function(data, crop_filter = NULL, region_filter = NULL) {
   
   # Conditional filtering
@@ -172,7 +173,7 @@ plot_yield_spread <- function(data, crop_filter = NULL, region_filter = NULL) {
 
 # ---- Generate all plots and collect all outliers ----
 crops <- c("Wheat", "Barley S", "Barley W", "Oats S", "Oats W", "OSR S", "OSR W")
-regions <- paste0("UKM", 5:9)
+regions <- c("TLM0", "TLM1", "TLM2", "TLM5", "TLM9")
 
 # Collect outliers from all plots
 all_outliers <- map2_dfr(
@@ -190,6 +191,5 @@ removals_FF_WC_Outliers <- removals_FF_WC %>%
 
 # 🔸 Save all outliers to CSV
 write_csv(all_outliers, "yield_outliers_summary.csv")
-
 message("📄 All outliers saved to 'yield_outliers_summary.csv'")
                   

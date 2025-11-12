@@ -79,18 +79,14 @@ Disposals_Oats$Crop <- rep("Oats",len=nrow(Disposals_Oats))
 # Append crop disposals dataframes
 Disposals_ALL = bind_rows(Disposals_Wheat, Disposals_Barley, Disposals_Oats)
 # Append and organise region data according to the CPH
-Disposals_ALL <- left_join(Disposals_ALL,Sample.NUTS2, by ="CPH" )
+Disposals_ALL <- left_join(Disposals_ALL,Sample.ITL225, by ="CPH" )
 # NUTS2 format for Region and filtering out 0 values (Filter production and set na to 0)
 Disposals_ALL <- Disposals_ALL %>%
   mutate(
-    Region = case_when(
-      NUTS2 == 1 ~ 'UKM5',
-      NUTS2 == 2 ~ 'UKM7',
-      NUTS2 == 3 ~ 'UKM9',
-      NUTS2 == 4 ~ 'UKM6',
-      NUTS2 == 5 ~ 'UKM8'))%>%
+    Region = ITL225CD,
+    Region_name = ITL225NM)%>%
   select(
-    CPH, parish, holding, Region, Crop, Production, everything(),-NUTS2)%>%
+    CPH, parish, holding, Region, Crop, Production, everything(),-ITL225CD)%>%
   filter(
     Production>0)%>%
   mutate_all(
@@ -101,26 +97,27 @@ joined_all1 <- joined_all %>%
   mutate(Crop = ifelse(Crop %in% c("Barley S", "Barley W"), "Barley", Crop)) %>%
   mutate(Crop = ifelse(Crop %in% c("Oats S", "Oats W"), "Oats", Crop)) %>% 
   mutate(Crop = ifelse(Crop %in% c("OSRape S", "OSRape W"), "OSRape", Crop)) %>% 
-  group_by(CPH, parish, holding, Region, Crop, NUTS2) %>%  # Group by CPH and the crop (remove suffixes from crop names)
+  group_by(CPH, parish, holding, Region, Crop) %>%  # Group by CPH and the crop (remove suffixes from crop names)
   summarise(
     Production = sum(Production), 
     Wholecrop = ifelse(any(Wholecrop == "YES"), "YES", "NO"), 
     .groups = "drop") %>% 
   anti_join(removals_FF_WC, by = c("parish", "holding", "Crop", "Region")) 
 
-combined_df <- left_join(joined_all1, Disposals_ALL, by = c("CPH", "parish", "holding", "Crop", "Region","Production"))
+combined_df <- left_join(joined_all1, Disposals_ALL, by = c("CPH", "parish", "holding", "Crop", "Region","Production")) %>% 
+  # Remove rows with missing key identifiers
+  filter(!is.na(Opening_stock_Oct))
 
 
 #  Disposals per crop type as a subset of Disposals_ALL
-Disposals_Crop <- subset(combined_df, select=c(Crop, Production, Merchants_for_Malting, Merchants_for_Feed, Merchants_for_Milling,
-                                                 Merchants_for_Seed, Merchants_for_Industrial, Merchants_for_Other, Farmers_in_Scotland,
-                                                 Farmers_outwith_Scotland, Used_for_Seed, Used_for_Feed, Waste_Other, Closing_Stock_Oct))
-Disposals_Crop <- Disposals_Crop%>%
-  group_by(Crop)%>%
-  summarise_all(sum)
-
+Disposals_Crop <- combined_df %>%
+  select(Crop, Production, Merchants_for_Malting, Merchants_for_Feed, Merchants_for_Milling,
+         Merchants_for_Seed, Merchants_for_Industrial, Merchants_for_Other, Farmers_in_Scotland,
+         Farmers_outwith_Scotland, Used_for_Seed, Used_for_Feed, Waste_Other, Closing_Stock_Oct) %>%
+  group_by(Crop) %>%
+  summarise(across(everything(), ~ sum(.x, na.rm = TRUE)))
 head(Disposals_Crop)
-# 
+ 
 # #export csv
 # # filename appropriate for data upload to erdm
 # str4 <- " - November - Disposals - Data - Raw Data - Formatted disposals data output - "
