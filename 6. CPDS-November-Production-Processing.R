@@ -13,6 +13,20 @@ Final_survey_results <- anti_join(joined_all, removals_yes, by = c("parish","hol
   mutate(CropGeneral = word(Crop, 1)) %>% 
   relocate(CropGeneral, .after = Crop)
 
+# filename appropriate for data upload to erdm
+str9 <- " - November - Data - Raw Data - Final production sample - "
+outputname4 <- paste(
+  crop_year,
+  str9,
+  format(Sys.Date(), "%d %B"),
+  str7,
+  sep = ""
+)
+write_xlsx(Final_survey_results, outputname4)
+
+
+
+
 ################################################################################
 #### Processing ################################################################
 ################################################################################
@@ -43,7 +57,9 @@ descriptive_stats_ITL225 <- Final_survey_results %>%
     sd_production = sd(Production, na.rm = TRUE),
     
     .groups = "drop"
-  )
+  ) %>%
+  mutate(CropGeneral = word(Crop, 1)) %>%
+  relocate(CropGeneral, .after = Crop)
 
 descriptive_stats_Scotland <- Final_survey_results %>%
   filter(!is.na(Yield), !is.na(Area), !is.na(Production)) %>%
@@ -70,7 +86,10 @@ descriptive_stats_Scotland <- Final_survey_results %>%
     sd_production = sd(Production, na.rm = TRUE),
     
     .groups = "drop"
-  )
+  ) %>%
+  mutate(CropGeneral = word(Crop, 1),
+         Region = "Scotland") %>%
+  relocate(CropGeneral, .after = Crop)
 
 descriptive_stats_Scotland_GeneralCrop <- Final_survey_results %>%
   filter(!is.na(Yield), !is.na(Area), !is.na(Production)) %>%
@@ -97,7 +116,10 @@ descriptive_stats_Scotland_GeneralCrop <- Final_survey_results %>%
     sd_production = sd(Production, na.rm = TRUE),
     
     .groups = "drop"
-  )
+  ) %>%
+  mutate(Crop = word(CropGeneral, 1),
+         Region = "Scotland") %>%
+  relocate(Crop, .before = CropGeneral)
 
 total_cereals_stats <- Final_survey_results %>%
   filter(CropGeneral %in% c("Wheat", "Barley", "Oats"),
@@ -120,11 +142,29 @@ total_cereals_stats <- Final_survey_results %>%
     range_production = max(Production, na.rm = TRUE) - min(Production, na.rm = TRUE),
     mean_production = mean(Production, na.rm = TRUE),
     sd_production = sd(Production, na.rm = TRUE)
-  )
+  )%>%
+  mutate(Crop = word(CropGeneral, 1),
+         Region = "Scotland") %>%
+  relocate(Crop, .before = CropGeneral)
+
 descriptive_stats_Scotland_GeneralCrop <- bind_rows(
   descriptive_stats_Scotland_GeneralCrop,
   total_cereals_stats
 )
+
+descriptive_stats_combined <- bind_rows(
+  descriptive_stats_ITL225,
+  descriptive_stats_Scotland,
+  descriptive_stats_Scotland_GeneralCrop
+  ) %>%
+  group_by(Region, Crop, CropGeneral) %>%
+  slice(1) %>%
+  ungroup()%>%
+  rename(
+    returns_descriptive = `Number of returns`,
+    sd_yield = `sd yield`
+  )
+
 
 ################################################################################
 Survey_results_ITL225 <- Final_survey_results %>%
@@ -233,17 +273,22 @@ scotland_general_yields <- production_raised_ITL225 %>%
 # Step 4: Join fallback yields
 production_raised_ITL225_2 <- production_raised_ITL225 %>%
   left_join(scotland_yields, by = c("Crop", "CropGeneral")) %>%
-  left_join(scotland_general_yields, by = "CropGeneral") %>%
   mutate(
+    threshold = if_else(Crop == "OSRape S", 3, 5),
+    
     raised_yield = case_when(
-      Region %in% target_regions & `Number of returns` < 5 & returns_scotland >= 5 ~ yield_scotland,
-      Region %in% target_regions & `Number of returns` < 5 & returns_scotland < 5 & returns_scotland_general >= 5 ~ yield_scotland_general,
-      Region == "Scotland" & `Number of returns` < 5 & returns_scotland_general >= 5 ~ yield_scotland_general,
+      Region %in% target_regions & `Number of returns` < threshold ~ yield_scotland,
       TRUE ~ yield
     ),
+    
+    Imputed = case_when(
+      Region %in% target_regions & `Number of returns` < threshold & returns_scotland >= threshold ~ "Yes Scotland level",
+      Region %in% target_regions & `Number of returns` < threshold & returns_scotland < threshold ~ "Yes Scotland level (low returns)",
+      TRUE ~ "No ITL225 level"
+    ),
+    
     production_raised = raised_yield * census_area
   )
-
 
 production_raised <- production_raised_ITL225_2 %>%
   mutate(
@@ -251,7 +296,7 @@ production_raised <- production_raised_ITL225_2 %>%
     Production = production_raised,
     Yield = Production / Area
   ) %>%
-  select(Region, Crop, CropGeneral, Area, Production, Yield) %>%
+  select(Region, Crop, CropGeneral, Area, Production, Yield, Imputed) %>%
   distinct(Region, Crop, CropGeneral, .keep_all = TRUE)
 
 ##############################################################################
