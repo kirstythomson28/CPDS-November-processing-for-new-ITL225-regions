@@ -40,16 +40,8 @@ QA_production_nov <- joined_all %>%
   ) %>% 
   mutate(
     CPH = paste0(str_pad(CPH_part1, 3, pad = "0"), "/", str_pad(CPH_part2, 4, pad = "0"))
-    # Crop = case_when(
-    #   Crop == "Barley S" ~ "Spring barley",
-    #   Crop == "Barley W" ~ "Winter barley",
-    #   Crop == "Oats S" ~ "Spring oats",
-    #   Crop == "Oats W" ~ "Winter oats",
-    #   Crop == "Oilseed Rape S" ~ "Spring oilseed rape",
-    #   Crop == "Oilseed Rape W" ~ "Winter oilseed rape",
-    #   TRUE ~ Crop
     ) %>%
-  select(-c(CPH_part1,CPH_part2)) %>% 
+  select(-c(CPH_part1,CPH_part2,`yield flag low`, `yield flag high`,ITL225CD)) %>% 
   mutate(reason = "manual outlier",
          `Final decision`="")
 
@@ -223,9 +215,10 @@ str5 <- " - November - Production - Data - QA - Removals (FF, WC and yield Outli
 outputname_removals <- paste(
   crop_year,
   str5,
-  format(Sys.Date(), "%d %B"),
+  format(Sys.time(), "%d %B %H-%M"),  # Includes day, month, hour, and minute
   str7,
   sep = ""
 )
+
 write_xlsx(removals_FF_WC_Outliers, outputname_removals)
                   
