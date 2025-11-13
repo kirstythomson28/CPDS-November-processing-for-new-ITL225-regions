@@ -39,23 +39,34 @@ QA_production_nov <- joined_all %>%
     Production = round(Production, 0)
   ) %>% 
   mutate(
-    CPH = paste0(str_pad(CPH_part1, 3, pad = "0"), "/", str_pad(CPH_part2, 4, pad = "0")),
-    Crop = case_when(
-      Crop == "Barley S" ~ "Spring barley",
-      Crop == "Barley W" ~ "Winter barley",
-      Crop == "Oats S" ~ "Spring oats",
-      Crop == "Oats W" ~ "Winter oats",
-      Crop == "Oilseed Rape S" ~ "Spring oilseed rape",
-      Crop == "Oilseed Rape W" ~ "Winter oilseed rape",
-      TRUE ~ Crop
-    )) %>% 
-  select(-c(CPH_part1,CPH_part2))
+    CPH = paste0(str_pad(CPH_part1, 3, pad = "0"), "/", str_pad(CPH_part2, 4, pad = "0"))
+    # Crop = case_when(
+    #   Crop == "Barley S" ~ "Spring barley",
+    #   Crop == "Barley W" ~ "Winter barley",
+    #   Crop == "Oats S" ~ "Spring oats",
+    #   Crop == "Oats W" ~ "Winter oats",
+    #   Crop == "Oilseed Rape S" ~ "Spring oilseed rape",
+    #   Crop == "Oilseed Rape W" ~ "Winter oilseed rape",
+    #   TRUE ~ Crop
+    ) %>%
+  select(-c(CPH_part1,CPH_part2)) %>% 
+  mutate(reason = "manual outlier",
+         `Final decision`="")
 
-QA_production_nov <- left_join(
+QA_production_nov_emails <- left_join(
   QA_production_nov,
   Sample %>% select(parish, holding, primary_email),
   by = c("parish", "holding")
-)
+  ) %>% 
+  mutate(Crop = case_when(
+             Crop == "Barley S" ~ "Spring barley",
+             Crop == "Barley W" ~ "Winter barley",
+             Crop == "Oats S" ~ "Spring oats",
+             Crop == "Oats W" ~ "Winter oats",
+             Crop == "Oilseed Rape S" ~ "Spring oilseed rape",
+             Crop == "Oilseed Rape W" ~ "Winter oilseed rape",
+             TRUE ~ Crop))
+  
 
 
 #export xlsx
@@ -68,7 +79,7 @@ outputname <- paste(
   str7,
   sep = ""
 )
-write_xlsx(QA_production_nov, outputname)
+write_xlsx(QA_production_nov_emails, outputname)
 
 ###############################################################################
 # Attempting to recreate outliers identification like in excel 
@@ -181,17 +192,40 @@ all_outliers <- map2_dfr(
   rep(regions, times = length(crops)),
   ~ plot_yield_spread(joined_all, crop_filter = .x, region_filter = .y)
 ) %>% 
-  mutate(reason="outlier",
+  mutate(reason="survey outlier",
          Wholecrop = "NO",
          `Final decision`="")
 
-removals_FF_WC_Outliers <- removals_FF_WC %>%
+combined_outliers <- QA_production_nov %>%
+  select(parish, holding, Crop, Region, Yield, reason, Wholecrop, `Final decision`) %>%
   bind_rows(
     all_outliers %>%
-      select(parish, holding, Crop, Region, Wholecrop, reason,`Final decision`)
-)
+      select(parish, holding, Crop, Region, Yield, Wholecrop, reason, `Final decision`)
+  ) %>%
+  group_by(parish, holding, Crop, Region) %>%
+  mutate(
+    reason = if (n() > 1) "double outlier" else reason
+  ) %>%
+  ungroup()
 
-# 🔸 Save all outliers to CSV
-write_csv(removals_FF_WC_Outliers, "yield_outliers_summary.csv")
-message("📄 All outliers saved to 'yield_outliers_summary.csv'")
+
+removals_FF_WC_Outliers <- removals_FF_WC %>%
+  bind_rows(
+    combined_outliers %>%
+      select(parish, holding, Crop, Region, Wholecrop, reason, `Final decision`)
+  ) %>%
+  distinct(parish, holding, Crop, Region, .keep_all = TRUE)
+
+
+#export xlsx
+# filename appropriate for data upload to erdm
+str5 <- " - November - Production - Data - QA - Removals (FF, WC and yield Outliers) - "
+outputname_removals <- paste(
+  crop_year,
+  str5,
+  format(Sys.Date(), "%d %B"),
+  str7,
+  sep = ""
+)
+write_xlsx(removals_FF_WC_Outliers, outputname_removals)
                   

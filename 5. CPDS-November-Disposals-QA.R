@@ -2,7 +2,6 @@
 
 ## QA ##
 ### Needs further development ###
-# Possibly have 2 in the future, 1 with 3 main flags for email QA and a separate that QA's the proportions#
 Disposals_oct_QA <- combined_df %>%
   rename_with(.fn = ~ paste0(.x, "_oct"), .cols = Merchants_for_Malting:Total_Disposed)
 
@@ -38,7 +37,7 @@ Disposals_QA_Flagged <- Disposals_QA_reordered %>%
     ),
     Oats_Malting_flag_Oct = if_else(
       Crop == "Oats" & Merchants_for_Malting_oct > 0.2 * Opening_stock_Oct,
-      "Merchants Seed flag",
+      "Malting flag",
       NA_character_
     ),
   )
@@ -92,7 +91,7 @@ Qa_emails <- data %>%
 
 #export xlsx
 # filename appropriate for data upload to erdm
-str9 <- "November - Data - Raw Data - QA - Emails for stock mis match - "
+str9 <- " - November - Data - Raw Data - QA - Emails for stock mis match - "
 outputname5 <- paste(
   crop_year,
   str8,

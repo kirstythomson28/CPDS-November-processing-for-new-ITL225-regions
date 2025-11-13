@@ -1,6 +1,6 @@
 ##Once QA is complete read back in yield_outliers_summary with Final Decision filled in manually for outliers
 ## remove FF, wholecropped and outliers from data 
-Finalised_removals <- read_csv("yield_outliers_summary.csv")
+Finalised_removals <-  read_excel("2025-26 - November - Production - Data - QA - Removals (FF, WC and yield Outliers) - 13 November.xlsx")
 
 #Filter removals to only rows where decision == "REMOVE"
 removals_yes <- Finalised_removals %>%
