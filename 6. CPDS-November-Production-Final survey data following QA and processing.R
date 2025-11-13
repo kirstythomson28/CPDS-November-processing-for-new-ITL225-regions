@@ -1,21 +1,22 @@
+##Once QA is complete read back in yield_outliers_summary with Final Decision filled in manually for outliers
 ## remove FF, wholecropped and outliers from data 
-Finalised_removals <- read_excel("2025-26 - November - Production - Data - QA - Production values flagged in QA as unexpected yield - 10 November.xlsx")
+Finalised_removals <- read_csv("yield_outliers_summary.csv")
+
 #Filter removals to only rows where decision == "REMOVE"
 removals_yes <- Finalised_removals %>%
-  filter(`Final decision (YES = remove, NO = Keep, CHANGE = change values)` == "REMOVE")%>%
-  select(parish, holding, Region, Crop, Wholecrop) %>% 
-  mutate(reason = "outlier following qa")
+  filter(`Final decision` == "remove")%>%
+  select(parish, holding, Region, Crop, Wholecrop, reason, `Final decision`)
 
-removals_yes2 <- bind_rows(
-  removals_FF_WC,
-  removals_yes)
 
 # Remove matching rows from main_data
-Final_survey_results <- anti_join(joined_all, removals_yes2, by = c("parish","holding")) %>%
+Final_survey_results <- anti_join(joined_all, removals_yes, by = c("parish","holding")) %>%
   mutate(CropGeneral = word(Crop, 1)) %>% 
   relocate(CropGeneral, .after = Crop)
 
+################################################################################
 #### Processing ################################################################
+################################################################################
+
 descriptive_stats_ITL225 <- Final_survey_results %>%
   filter(!is.na(Yield), !is.na(Area), !is.na(Production)) %>%  # Remove rows with missing values
   group_by(Crop, Region) %>%
@@ -207,27 +208,44 @@ census <- june_census %>%
   select(Region, Crop, CropGeneral, census_area, `Number of holdings`)
 
 
+# Step 0: Define target regions
+target_regions <- c("TLM0", "TLM1", "TLM2", "TLM3", "TLM5", "TLM9")
+
+# Step 1: Prepare base dataset
 production_raised_ITL225 <- Survey_results_combined %>%
-  left_join(census, by = c("Region", "Crop","CropGeneral")) %>% 
-  relocate(CropGeneral, .after = Crop) %>% 
+  left_join(census, by = c("Region", "Crop", "CropGeneral")) %>%
+  distinct(Crop, Region, CropGeneral, .keep_all = TRUE) %>%
+  relocate(CropGeneral, .after = Crop) %>%
   relocate(census_area, .after = survey_area)
 
-
-# Step 1: Create a lookup table of Scotland yields by Crop
+# Step 2: Get fallback yields from Scotland
 scotland_yields <- production_raised_ITL225 %>%
   filter(Region == "Scotland") %>%
-  select(Crop, CropGeneral, yield_scotland = yield)
+  select(Crop, CropGeneral, `Number of returns`, yield) %>%
+  rename(yield_scotland = yield, returns_scotland = `Number of returns`)
 
-# Step 2: Join Scotland yields to all rows
-production_raised_ITL225 <- production_raised_ITL225 %>%
+# Step 3: Get fallback yields from CropGeneral in Scotland
+scotland_general_yields <- production_raised_ITL225 %>%
+  filter(Region == "Scotland", Crop == CropGeneral) %>%
+  select(CropGeneral, `Number of returns`, yield) %>%
+  rename(yield_scotland_general = yield, returns_scotland_general = `Number of returns`)
+
+# Step 4: Join fallback yields
+production_raised_ITL225_2 <- production_raised_ITL225 %>%
   left_join(scotland_yields, by = c("Crop", "CropGeneral")) %>%
+  left_join(scotland_general_yields, by = "CropGeneral") %>%
   mutate(
-    raised_yield = if_else(`Number of returns` < 5, yield_scotland, yield),
+    raised_yield = case_when(
+      Region %in% target_regions & `Number of returns` < 5 & returns_scotland >= 5 ~ yield_scotland,
+      Region %in% target_regions & `Number of returns` < 5 & returns_scotland < 5 & returns_scotland_general >= 5 ~ yield_scotland_general,
+      Region == "Scotland" & `Number of returns` < 5 & returns_scotland_general >= 5 ~ yield_scotland_general,
+      TRUE ~ yield
+    ),
     production_raised = raised_yield * census_area
   )
 
 
-Final_results <- production_raised_ITL225 %>%
+production_raised <- production_raised_ITL225_2 %>%
   mutate(
     Area = census_area,
     Production = production_raised,
@@ -236,7 +254,16 @@ Final_results <- production_raised_ITL225 %>%
   select(Region, Crop, CropGeneral, Area, Production, Yield) %>%
   distinct(Region, Crop, CropGeneral, .keep_all = TRUE)
 
+##############################################################################
+# Define the crops of interest
+target_crops_DEFRA <- c("Wheat","Barley W", "Barley S", "Oats", "OSRape")
 
+# Filter and select relevant columns
+DEFRA_export_table <- production_raised %>%
+  filter(Region == "Scotland", Crop %in% target_crops_DEFRA) %>%
+  select(Crop, Area, Yield, Production)
 
+# Optional: Export to CSV
+write.csv(DEFRA_export_table, "scotland_crop_summary.csv", row.names = FALSE)
 
 

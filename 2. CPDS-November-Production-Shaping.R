@@ -162,13 +162,15 @@ joined_all <- left_join(Crops_all,Sample.ITL225, by ="CPH" )%>%
 
 wholecropped <- joined_all %>%
   filter(Wholecrop == "YES") %>%
-  mutate(reason = "wholecropped")
+  mutate(reason = "wholecropped",
+         `Final decision` = "remove")
+
 
 removals_FF_WC <- removals_FF %>%
   bind_rows(
     wholecropped %>%
       mutate(Wholecrop = as.character(Wholecrop)) %>%
-      select(parish, holding, Crop, Region, Wholecrop, reason))
+      select(parish, holding, Crop, Region, Wholecrop, reason, `Final decision`))
 
 joined_all <- joined_all %>%
   anti_join(removals_FF_WC, by = c("parish", "holding", "Crop", "Region"))    
