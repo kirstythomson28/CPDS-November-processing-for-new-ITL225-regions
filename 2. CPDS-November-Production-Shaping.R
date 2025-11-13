@@ -176,15 +176,15 @@ joined_all <- joined_all %>%
   anti_join(removals_FF_WC, by = c("parish", "holding", "Crop", "Region"))    
         
   
-#export csv
+#export xlsx
 #filename appropriate for data upload to erdm
 str2 <- " - November - Production - Data - Raw Data - Formatted production data output (FF & WhCr removed) - "
-outputname <- paste(
+outputname2 <- paste(
   crop_year,
   str2,
   format(Sys.Date(), "%d %B"),
-  str3,
+  str7,
   sep = ""
 )
-write.csv(joined_all, outputname, row.names = FALSE)
+write_xlsx(joined_all, outputname2)
 
