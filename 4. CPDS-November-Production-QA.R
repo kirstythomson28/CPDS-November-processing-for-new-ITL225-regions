@@ -7,8 +7,8 @@ low_bounds <- c(
   "Barley W" = 3,
   "Oats S" = 3, 
   "Oats W" = 3, 
-  "OSR S" = 1, 
-  "OSR W" = 1.5
+  "OSRape S" = 1, 
+  "OSRape W" = 1.5
 )
 
 high_bounds <- c(
@@ -17,8 +17,8 @@ high_bounds <- c(
   "Barley W" = 11,
   "Oats S" = 11, 
   "Oats W" = 11, 
-  "OSR S" = 4.5, 
-  "OSR W" = 6
+  "OSRape S" = 4.5, 
+  "OSRape W" = 6
 )
 
 QA_production_nov <- joined_all %>%
@@ -55,19 +55,19 @@ QA_production_nov_emails <- left_join(
              Crop == "Barley W" ~ "Winter barley",
              Crop == "Oats S" ~ "Spring oats",
              Crop == "Oats W" ~ "Winter oats",
-             Crop == "Oilseed Rape S" ~ "Spring oilseed rape",
-             Crop == "Oilseed Rape W" ~ "Winter oilseed rape",
+             Crop == "OSRape S" ~ "Spring oilseed rape",
+             Crop == "OSRape W" ~ "Winter oilseed rape",
              TRUE ~ Crop))
   
 
 
 #export xlsx
 # filename appropriate for data upload to erdm
-str5 <- " - November - Production - Data - QA - Production values flagged in QA as unexpected yield - "
+str5 <- " - November - Production - Data - QA - Production values flagged in QA as unexpected yield (manual bounds) - "
 outputname <- paste(
   crop_year,
   str5,
-  format(Sys.Date(), "%d %B"),
+  format(Sys.time(), "%d %B %H-%M"),  
   str7,
   sep = ""
 )
@@ -175,7 +175,7 @@ plot_yield_spread <- function(data, crop_filter = NULL, region_filter = NULL) {
 
 
 # ---- Generate all plots and collect all outliers ----
-crops <- c("Wheat", "Barley S", "Barley W", "Oats S", "Oats W", "OSR S", "OSR W")
+crops <- c("Wheat", "Barley S", "Barley W", "Oats S", "Oats W", "OSRape S", "OSRape W")
 regions <- c("TLM0", "TLM1", "TLM2", "TLM5", "TLM9")
 
 # Collect outliers from all plots
@@ -215,7 +215,7 @@ str5 <- " - November - Production - Data - QA - Removals (FF, WC and yield Outli
 outputname_removals <- paste(
   crop_year,
   str5,
-  format(Sys.time(), "%d %B %H-%M"),  # Includes day, month, hour, and minute
+  format(Sys.time(), "%d %B %H-%M"),
   str7,
   sep = ""
 )

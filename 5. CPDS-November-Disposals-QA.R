@@ -57,7 +57,7 @@ View(Disposals_QA_with_issues)
 
 #export xlsx
 # filename appropriate for data upload to erdm
-str8 <- "November - Data - Raw Data - QA - November Disposals requiring QA - "
+str8 <- " - November - Disposals - Data - Raw Data - QA - November Disposals requiring QA - "
 outputname4 <- paste(
   crop_year, 
   str8, 
@@ -91,7 +91,7 @@ Qa_emails <- data %>%
 
 #export xlsx
 # filename appropriate for data upload to erdm
-str9 <- " - November - Data - Raw Data - QA - Emails for stock mis match - "
+str9 <- " - November - Disposals - Data - Raw Data - QA - Emails for stock mis match - "
 outputname5 <- paste(
   crop_year,
   str8,
