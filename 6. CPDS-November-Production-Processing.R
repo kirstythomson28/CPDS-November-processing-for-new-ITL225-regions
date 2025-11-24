@@ -1,6 +1,6 @@
 ##Once QA is complete read back in yield_outliers_summary with Final Decision filled in manually for outliers
 ## remove FF, wholecropped and outliers from data 
-Finalised_removals <-  read_excel("2025-26 - November - Production - Data - QA - Removals (FF, WC and yield Outliers) - 13 November.xlsx")
+Finalised_removals <-  read_excel("2025-26 - November - Production - Data - QA - Removals (FF, WC and yield Outliers) - 21 November 09-33.xlsx")
 
 #Filter removals to only rows where decision == "REMOVE"adj_yield
 removals_yes <- Finalised_removals %>%
@@ -57,14 +57,13 @@ write_xlsx(Final_survey_results, outputname4)
 ################################################################################
 
 descriptive_stats_ITL225 <- Final_survey_results %>%
-  # Only require Yield to be non-missing (after imputation)
   filter(!is.na(adj_yield)) %>%
   group_by(Crop, Region) %>%
   summarise(
     `Number of returns` = n(),
     `min yield` = min(adj_yield, na.rm = TRUE),
     `max yield` = max(adj_yield, na.rm = TRUE),
-    `range yield` = max(adj_yield, na.rm = TRUE) - min(Yield, na.rm = TRUE),
+    `range yield` = max(adj_yield, na.rm = TRUE) - min(adj_yield, na.rm = TRUE),
     `mean yield` = mean(adj_yield, na.rm = TRUE),
     `sd yield` = sd(adj_yield, na.rm = TRUE),
     min_area = min(Area, na.rm = TRUE),

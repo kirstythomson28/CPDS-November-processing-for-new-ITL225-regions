@@ -58,12 +58,15 @@ QA_production_nov_emails <- left_join(
              Crop == "OSRape S" ~ "Spring oilseed rape",
              Crop == "OSRape W" ~ "Winter oilseed rape",
              TRUE ~ Crop))
-  
 
+QA_production_nov_emails_new <- anti_join(
+  QA_production_nov_emails, Yield_QA_Log,   
+  by = c("CPH", "parish", "holding", "Region", "Crop"))
+view(QA_production_nov_emails_new)
 
 #export xlsx
 # filename appropriate for data upload to erdm
-str5 <- " - November - Production - Data - QA - Production values flagged in QA as unexpected yield (manual bounds) - "
+str5 <- " - November - Production - Data - QA - Production QA as unexpected yield (manual bounds) - "
 outputname <- paste(
   crop_year,
   str5,
@@ -71,7 +74,7 @@ outputname <- paste(
   str7,
   sep = ""
 )
-write_xlsx(QA_production_nov_emails, outputname)
+write_xlsx(QA_production_nov_emails_new, outputname)
 
 ###############################################################################
 # Attempting to recreate outliers identification like in excel 
