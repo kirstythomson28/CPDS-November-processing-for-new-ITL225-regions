@@ -1,6 +1,6 @@
 ##Once QA is complete read back in yield_outliers_summary with Final Decision filled in manually for outliers
 ## remove FF, wholecropped and outliers from data 
-Finalised_removals <-  read_excel("2025-26 - November - Production - Data - QA - Removals (FF, WC and yield Outliers) - 21 November 09-33.xlsx")
+Finalised_removals <-  read_excel("2025-26 - November - Production - Data - QA - Removals (FF, WC and yield Outliers) - 24 November 08-56.xlsx")
 
 #Filter removals to only rows where decision == "REMOVE"adj_yield
 removals_yes <- Finalised_removals %>%
@@ -471,3 +471,47 @@ outputname4 <- paste(
 )
 write_xlsx(DEFRA_export_table, outputname4)
 
+###### CH_data
+
+Newest_year_CH_data <- Final_results %>% 
+  mutate(Year = 2025) %>%
+  filter(Crop %in% c("Total_Oats", "Total_OSRape", "Barley S",
+                     "Total_cereals","Total_Wheat","Barley W", "Total_Barley"),
+         Region == "Scotland") %>% 
+  pivot_wider(
+    id_cols = Year,   # keep Year as a column
+    names_from = Crop,
+    values_from = c(Production, Area, Yield),
+    names_glue = "{Crop}_{.value}"   # creates names like Oats_Production, Oats_Area, Oats_Yield
+  ) %>%
+  rename(
+    Oats_Production      = Total_Oats_Production,
+    OSR_Production       = Total_OSRape_Production,
+    S_Barley_Production  = `Barley S_Production`,
+    W_Barley_Production  = `Barley W_Production`,
+    Barley_Production    = Total_Barley_Production,
+    Cereals_Production   = Total_cereals_Production,
+    Wheat_Production     = Total_Wheat_Production,
+
+    Oats_Area            = Total_Oats_Area,
+    OSR_Area             = Total_OSRape_Area,
+    S_Barley_Area        = `Barley S_Area`,
+    W_Barley_Area        = `Barley W_Area`,
+    Barley_Area          = Total_Barley_Area,
+    Cereals_Area         = Total_cereals_Area,
+    Wheat_Area           = Total_Wheat_Area,
+
+    Oats_Yield           = Total_Oats_Yield,
+    OSR_Yield            = Total_OSRape_Yield,
+    S_Barley_Yield       = `Barley S_Yield`,
+    W_Barley_Yield       = `Barley W_Yield`,
+    Barley_Yield         = Total_Barley_Yield,
+    Cereals_Yield        = Total_cereals_Yield,
+    Wheat_Yield          = Total_Wheat_Yield
+  ) %>%
+  mutate(across(ends_with("_Production"), as.numeric),
+         across(ends_with("_Area"), as.numeric),
+         across(ends_with("_Yield"), as.numeric))
+
+
+ch_data <- bind_rows(ch_data, Newest_year_CH_data)
