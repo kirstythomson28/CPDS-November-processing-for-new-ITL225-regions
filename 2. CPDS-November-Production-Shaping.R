@@ -186,5 +186,6 @@ outputname2 <- paste(
   str7,
   sep = ""
 )
-write_xlsx(joined_all, outputname2)
+write_xlsx(joined_all,
+           file.path("November results", outputname2))
 
