@@ -57,7 +57,7 @@ View(Disposals_QA_with_issues)
 
 #export xlsx
 # filename appropriate for data upload to erdm
-str8 <- " - November - Disposals - Data - Raw Data - QA - November Disposals requiring QA - "
+str8 <- " - November Disposals requiring QA - "
 outputname4 <- paste(
   crop_year, 
   str8, 
@@ -65,7 +65,11 @@ outputname4 <- paste(
   str3, 
   sep = "") 
 
-write.csv(Disposals_QA_with_issues, outputname4, row.names = FALSE)
+write.csv(
+  Disposals_QA_with_issues,
+  file = file.path("QA charts", outputname4),
+  row.names = FALSE
+)
 
 
 ## Data set to be used in mail merge for stock mismatch.
@@ -91,11 +95,24 @@ Qa_emails <- data %>%
 
 #export xlsx
 # filename appropriate for data upload to erdm
-str9 <- " - November - Disposals - Data - Raw Data - QA - Emails for stock mis match - "
+str9 <- "- QA - Emails for stock mis match - "
 outputname5 <- paste(
   crop_year,
   str8,
   format(Sys.Date(), format="%d %B"), 
   str3,
   sep = "")
-write.csv(Qa_emails, outputname5, row.names = FALSE)
+
+# Save to Mail merge
+write.csv(
+  Qa_emails,
+  file = file.path("Mail merge", outputname5),
+  row.names = FALSE
+)
+
+# Save to QA files
+write.csv(
+  Qa_emails,
+  file = file.path("QA files", outputname5),
+  row.names = FALSE
+)

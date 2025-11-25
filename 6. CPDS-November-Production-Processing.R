@@ -1,6 +1,8 @@
 ##Once QA is complete read back in yield_outliers_summary with Final Decision filled in manually for outliers
 ## remove FF, wholecropped and outliers from data 
-Finalised_removals <-  read_excel("2025-26 - November - Production - Data - QA - Removals (FF, WC and yield Outliers) - 24 November 08-56.xlsx")
+Finalised_removals <- read_excel(
+  file.path("November results",
+            "2025-26 - November - Production - Data - QA - Removals (FF, WC and yield Outliers) - 24 November 08-56.xlsx"))
 
 #Filter removals to only rows where decision == "REMOVE"adj_yield
 removals_yes <- Finalised_removals %>%
@@ -47,7 +49,10 @@ outputname4 <- paste(
   str7,
   sep = ""
 )
-write_xlsx(Final_survey_results, outputname4)
+write_xlsx(
+  Final_survey_results,
+  file.path("November results", outputname4)
+)
 
 
 
@@ -447,7 +452,10 @@ outputname4 <- paste(
   str7,
   sep = ""
 )
-write_xlsx(Final_results, outputname4)
+write_xlsx(
+  Final_results,
+  file.path("November results", outputname4)
+)
 
 
 ##############################################################################
@@ -469,7 +477,10 @@ outputname4 <- paste(
   str7,
   sep = ""
 )
-write_xlsx(DEFRA_export_table, outputname4)
+write_xlsx(
+  DEFRA_export_table,
+  file.path("November results", outputname4)
+)
 
 ###### CH_data
 

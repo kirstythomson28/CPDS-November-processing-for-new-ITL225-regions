@@ -62,11 +62,12 @@ QA_production_nov_emails <- left_join(
 QA_production_nov_emails_new <- anti_join(
   QA_production_nov_emails, Yield_QA_Log,   
   by = c("CPH", "parish", "holding", "Region", "Crop"))
+
 view(QA_production_nov_emails_new)
 
 #export xlsx
 # filename appropriate for data upload to erdm
-str5 <- " - November - Production - Data - QA - Production QA as unexpected yield (manual bounds) - "
+str5 <- " - Production QA as unexpected yield (manual bounds) - "
 outputname <- paste(
   crop_year,
   str5,
@@ -74,7 +75,10 @@ outputname <- paste(
   str7,
   sep = ""
 )
-write_xlsx(QA_production_nov_emails_new, outputname)
+write_xlsx(
+  QA_production_nov_emails_new,
+  file.path("QA files", outputname)
+)
 
 ###############################################################################
 # Attempting to recreate outliers identification like in excel 
@@ -159,12 +163,13 @@ plot_yield_spread <- function(data, crop_filter = NULL, region_filter = NULL) {
     gsub(" ", "_", .)
   
   ggsave(
-    filename = file_name,
+    filename = file.path("QA files", file_name),
     plot = p,
     device = "svg",
     width = 8,
     height = 6
   )
+  
   
   message(glue("✅ Saved plot: {file_name}"))
   
@@ -214,7 +219,7 @@ removals_FF_WC_Outliers <- removals_FF_WC %>%
 
 #export xlsx
 # filename appropriate for data upload to erdm
-str5 <- " - November - Production - Data - QA - Removals (FF, WC and yield Outliers) - "
+str5 <- "- Removals (FF, WC and yield Outliers) - "
 outputname_removals <- paste(
   crop_year,
   str5,
@@ -223,5 +228,9 @@ outputname_removals <- paste(
   sep = ""
 )
 
-write_xlsx(removals_FF_WC_Outliers, outputname_removals)
+write_xlsx(
+  removals_FF_WC_Outliers,
+  file.path("QA files", outputname_removals)
+)
+
                   

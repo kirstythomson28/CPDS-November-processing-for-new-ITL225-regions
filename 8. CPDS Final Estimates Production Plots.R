@@ -1,5 +1,3 @@
-setwd("C:/Users/U457174/SCOTS Connect/Agricultural Statistics Unit - Economic Statistics/TIFF/Cereals November 2025/Tables and charts")
-
 ## Code for producing the plots used in the cereals final estimates publication.
 ## Adapted from code used for the final ests. publication.
 
@@ -48,8 +46,6 @@ theme_resas <- theme_bw(base_size = 12) +
 # Update theme used by default:
 theme_set(theme_resas)
 
-#Define the harvest year here
-CurrentYear = 2025
 #Set up graph parameters based on harvest year
 # TenYearsAgo = CurrentYear-10
 xlimits = c(CurrentYear-9, CurrentYear)
@@ -171,8 +167,16 @@ Crop <- ggplot(df_total_cereals, aes(Year)) +
 
 Crop
 
-ggsave(filename = paste0("CH_",CurrentYear,"_final estimates_total cereals production.svg"), plot = Crop, width = SVGWidth, height = SVGHeight, units = "mm", dpi = "retina", bg = "white")
-
+ggsave(
+  filename = file.path("Publication charts",
+                       paste0("CH_", CurrentYear, "_final estimates_total cereals production.svg")),
+  plot = Crop,
+  width = SVGWidth,
+  height = SVGHeight,
+  units = "mm",
+  dpi = "retina",
+  bg = "white"
+)
 
 
 
@@ -315,8 +319,16 @@ Crop <- ggplot(df_barley, aes(Year)) +
 
 Crop
 
-ggsave(filename = paste0("CH_",CurrentYear,"_final estimates_barley production.svg"), plot = Crop, width = SVGWidth, height = SVGHeight, units = "mm", dpi = 320, bg = "white")
-
+ggsave(
+  filename = file.path("Publication charts",
+                       paste0("CH_", CurrentYear, "_final estimates_barley production.svg")),
+  plot = Crop,
+  width = SVGWidth,
+  height = SVGHeight,
+  units = "mm",
+  dpi = 320,
+  bg = "white"
+)
 
 ################################################################################
 #################################### Oats Crop #################################
@@ -407,7 +419,16 @@ Crop <- ggplot(df_oats, aes(Year)) +
 
 Crop
 
-ggsave(filename = paste0("CH_",CurrentYear,"_final estimates_oats production.svg"), Crop, width = SVGWidth, height = SVGHeight, units = "mm", dpi = "retina", bg = "white")
+ggsave(
+  filename = file.path("Publication charts",
+                       paste0("CH_", CurrentYear, "_final estimates_oats production.svg")),
+  plot = Crop,
+  width = SVGWidth,
+  height = SVGHeight,
+  units = "mm",
+  dpi = "retina",
+  bg = "white"
+)
 
 ################################################################################
 ######################### Wheat ################################################
@@ -504,8 +525,16 @@ Crop <- ggplot(df_wheat, aes(Year)) +
 
 Crop
 
-ggsave(filename = paste0("CH_",CurrentYear,"_wheat_production.svg"), plot = Crop, width = SVGWidth, height = SVGHeight, units = "mm", dpi = "retina", bg = "white")
-
+ggsave(
+  filename = file.path("Publication charts",
+                       paste0("CH_", CurrentYear, "_wheat_production.svg")),
+  plot = Crop,
+  width = SVGWidth,
+  height = SVGHeight,
+  units = "mm",
+  dpi = "retina",
+  bg = "white"
+)
 
 ################################################################################
 ###################################### OSR #####################################
@@ -600,4 +629,15 @@ Crop <- ggplot(df_osr, aes(Year)) +
   )
 
 Crop
-ggsave(filename = paste0("CH_",CurrentYear,"_final estimates_wheat production.svg"), plot = Crop, width = SVGWidth, height = SVGHeight, units = "mm", dpi = "retina", bg = "white")
+
+ggsave(
+  filename = file.path("Publication charts",
+                       paste0("CH_", CurrentYear, "_final estimates_wheat production.svg")),
+  plot = Crop,
+  width = SVGWidth,
+  height = SVGHeight,
+  units = "mm",
+  dpi = "retina",
+  bg = "white"
+)
+
