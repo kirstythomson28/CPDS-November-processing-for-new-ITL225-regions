@@ -9,7 +9,7 @@ library(glue)
 library(tidyr)
 
 # Define the folders you want
-folders <- c("Setup documents", "Mail merge","November results", "QA charts", "Publication charts")
+folders <- c("Setup documents", "Mail merge","November results", "QA files", "Publication charts")
 
 # Create them if they don't exist
 for (f in folders) {
@@ -20,7 +20,7 @@ for (f in folders) {
 
 # Set crop year 
 crop_year <- "2025-26"
-CurrentYear <- "2025"
+CurrentYear = 2025
 
 # load in main cereal sample csv
 Sample <- read_csv(file.path("Setup documents",
