@@ -27,7 +27,7 @@ Sample <- read_csv(file.path("Setup documents",
                              "Main_sample_2025 - Excludes test farms.csv"))
 
 # load in raw cereal survey data tsv from "all cereal forms" export
-df_raw <- read_tsv(file.path("Setup documents", "QuickStatsExtract 680 All (10).tsv"))
+df_raw <- read_tsv(file.path("Setup documents", "QuickStatsExtract 680 All (11).tsv"))
 
 # Load in November sample for mailmerge ex FF
 full_data <- read_excel(file.path("Setup documents",

@@ -440,6 +440,8 @@ total_cereals <- Final_results %>%
 # Append Total_cereals to Final_results
 Final_results <- bind_rows(Final_results, total_cereals)
 
+view(Final_results)
+
 # filename appropriate for data upload to erdm
 str9 <- " - November - Production - Data - Final results - "
 outputname4 <- paste(
@@ -464,6 +466,7 @@ DEFRA_export_table <- Final_results %>%
   filter(Region == "Scotland", Crop %in% target_crops_DEFRA) %>%
   select(Crop, Area, Yield, Production)
 
+view(DEFRA_export_table)
 
 # filename appropriate for data upload to erdm
 str9 <- " - November - Production - Data - DEFRA Export table - "
