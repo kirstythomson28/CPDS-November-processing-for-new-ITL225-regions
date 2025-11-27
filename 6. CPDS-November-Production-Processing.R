@@ -459,24 +459,25 @@ write_xlsx(
 
 ##############################################################################
 # Define the crops of interest
-target_crops_DEFRA <- c("Total_Wheat","Barley W", "Barley S", "Total_barley",
-                        "Total_Oats", "Total_OSRape")
+target_crops_DEFRA <- c("Total_Wheat","Barley W","Barley S","Total_Barley",
+                        "Total_Oats","Total_OSRape")
 
 DEFRA_export_table <- Final_results %>%
   filter(Region == "Scotland", Crop %in% target_crops_DEFRA) %>%
   mutate(
     Crop = recode(Crop,                                     
-                  "Total_Wheat" = "Wheat",
-                  "Barley W"   = "Barley - Winter",
-                  "Barley S"   = "Barley - Spring",
-                  "Total_barley" = "Barley - all",
-                  "Total_Oats" = "Oats",
-                  "Total_OSRape" = "Oilseed Rape - all"),
+                  "Total_Wheat"   = "Wheat",
+                  "Barley W"      = "Barley - Winter",
+                  "Barley S"      = "Barley - Spring",
+                  "Total_Barley"  = "Barley - all",
+                  "Total_Oats"    = "Oats",
+                  "Total_OSRape"  = "Oilseed Rape - all"),
     Crop = factor(Crop, levels = c("Wheat","Barley - Winter","Barley - Spring",
-                                   "Barley - all","Oats","Oilseed Rape - all")) # enforce order
+                                   "Barley - all","Oats","Oilseed Rape - all"))
   ) %>%
   select(Crop, Area, Yield, Production) %>%
   arrange(Crop)
+
 
 view(DEFRA_export_table)
 
