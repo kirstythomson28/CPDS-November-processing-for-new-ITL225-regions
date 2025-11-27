@@ -89,6 +89,10 @@ write_xlsx(
   QA_production_nov_emails_new,
   file.path("QA files", outputname)
 )
+write_xlsx(
+  QA_production_nov_emails_new,
+  file.path("Mail merge", outputname)
+)
 
 ###############################################################################
 # Attempting to recreate outliers identification like in excel 
