@@ -10,31 +10,9 @@ removals_yes <- Finalised_removals %>%
 # Remove matching rows from main_data
 Final_survey_results <- anti_join(joined_all, removals_yes, by = c("parish","holding")) %>%
   mutate(
-    CropGeneral = word(Crop, 1),
-    Yield = if_else(
-      is.na(Yield) & !is.na(Production) & !is.na(Area) & Area != 0,
-      Production / Area,
-      Yield
-    ),
-    # Step 1: ensure numeric moisture
-    Moisture_content = as.numeric(Moisture_content),
-    standard_moisture = if_else(Crop %in% c("OSRape W", "OSRape S"), 9.0, 14.5),
-    
-    # Step 2: adjustment logic using coalesce
-    adjustment = coalesce(
-      (100 - Moisture_content) / (100 - standard_moisture),
-      1.0   # default when Moisture_content is NA
-    ),
-    
-    # Step 3: adjusted production
-    adj_production = Production * adjustment,
-    
-    # Step 4: adjusted yield
-    adj_yield = if_else(Area != 0 & !is.na(Area), adj_production / Area, NA_real_)
+    CropGeneral = word(Crop, 1)
   ) %>%
   relocate(CropGeneral, .after = Crop)
-
-
 
 
 # filename appropriate for data upload to erdm
