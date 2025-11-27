@@ -59,8 +59,18 @@ QA_production_nov_emails <- left_join(
              Crop == "OSRape W" ~ "Winter oilseed rape",
              TRUE ~ Crop))
 
+Yield_QA_Log_emails <- Yield_QA_Log %>% 
+  mutate(Crop = case_when(
+    Crop == "Barley S" ~ "Spring barley",
+    Crop == "Barley W" ~ "Winter barley",
+    Crop == "Oats S" ~ "Spring oats",
+    Crop == "Oats W" ~ "Winter oats",
+    Crop == "OSRape S" ~ "Spring oilseed rape",
+    Crop == "OSRape W" ~ "Winter oilseed rape",
+    TRUE ~ Crop))
+
 QA_production_nov_emails_new <- anti_join(
-  QA_production_nov_emails, Yield_QA_Log,   
+  QA_production_nov_emails, Yield_QA_Log_emails,   
   by = c("CPH", "parish", "holding", "Region", "Crop"))
 
 view(QA_production_nov_emails_new)
@@ -176,7 +186,7 @@ plot_yield_spread <- function(data, crop_filter = NULL, region_filter = NULL) {
   # Return outliers
   outlier_data <- filtered_data %>%
     filter(is_outlier) %>%
-    select(CPH,parish, holding, Crop, Region, Yield, adj_yield)
+    select(CPH,parish, holding, Region, Crop, Area, Production, Moisture_content, Yield, adj_yield, adj_production)
   
   return(outlier_data)
 }
@@ -197,30 +207,51 @@ all_outliers <- map2_dfr(
          `Final decision`="")
 
 combined_outliers <- QA_production_nov %>%
-  select(CPH, parish, holding, Crop, Region, Yield, adj_yield, reason, Wholecrop, `Final decision`) %>%
+  select(CPH,parish, holding, Region, Crop, Area, Production, Moisture_content, 
+         Yield, adj_yield, adj_production, reason, Wholecrop, `Final decision`) %>%
   bind_rows(
     all_outliers %>%
-      select(CPH, parish, holding, Crop, Region, Yield, adj_yield, reason, Wholecrop, `Final decision`)
+      select(CPH,parish, holding, Region, Crop, Area, Production, Moisture_content,
+             Yield, adj_yield, adj_production, reason, Wholecrop, `Final decision`)
   ) %>%
-  group_by(parish, holding, Crop, Region) %>%
-  mutate(
-    reason = if (n() > 1) "double outlier" else reason
-  ) %>%
-  ungroup()
+  group_by(parish, holding,  Region, Crop) %>%
+  mutate(reason = if (n() > 1) "double outlier" else reason) %>%
+  ungroup() %>%
+  distinct(parish, holding,  Region, Crop, .keep_all = TRUE)
 
 
+Yield_QA_Log <- Yield_QA_Log %>%
+  bind_rows(
+    combined_outliers %>%
+      anti_join(Yield_QA_Log,
+                by = c("CPH", "parish", "holding", "Region", "Crop"))
+  )
+
+#export xlsx
+# filename appropriate for data upload to erdm
+str5 <- " - November - Production - Data - QA - LOG"
+outputname_removals <- paste(
+  crop_year,
+  str5,
+  str7,
+  sep = ""
+)
+
+write_xlsx(
+  Yield_QA_Log,
+  file.path("Setup documents", outputname_removals)
+)
 
 removals_FF_WC_Outliers <- removals_FF_WC %>%
   bind_rows(
     Yield_QA_Log %>%
       select(CPH, parish, holding, Region, Crop, Yield, adj_yield, reason, Wholecrop, `Final decision`)
-  )
-
-
+  )%>%
+  distinct(parish, holding,  Region, Crop, .keep_all = TRUE)
 
 #export xlsx
 # filename appropriate for data upload to erdm
-str5 <- "- Removals (FF, WC and yield Outliers) - "
+str5 <- " - Removals (FF, WC and yield Outliers) - "
 outputname_removals <- paste(
   crop_year,
   str5,
