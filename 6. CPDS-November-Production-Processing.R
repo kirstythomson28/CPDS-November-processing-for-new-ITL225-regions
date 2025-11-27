@@ -1,7 +1,7 @@
 ##Once QA is complete read back in yield_outliers_summary with Final Decision filled in manually for outliers
 ## remove FF, wholecropped and outliers from data 
 
-#Filter removals to only rows where decision == "REMOVE"adj_yield
+#Filter removals to only rows where decision == "REMOVE" 
 removals_yes <- Finalised_removals %>%
   filter(`Final decision` == "remove")%>%
   select(parish, holding, Region, Crop, Wholecrop, reason, `Final decision`)
@@ -498,7 +498,7 @@ write_xlsx(
 ###### CH_data
 
 Newest_year_CH_data <- Final_results %>% 
-  mutate(Year = 2025) %>%
+  mutate(Year = CurrentYear) %>%
   filter(Crop %in% c("Total_Oats", "Total_OSRape", "Barley S",
                      "Total_cereals","Total_Wheat","Barley W", "Total_Barley"),
          Region == "Scotland") %>% 
