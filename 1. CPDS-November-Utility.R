@@ -27,7 +27,7 @@ Sample <- read_csv(file.path("Setup documents",
                              "Main_sample_2025 - Excludes test farms.csv"))
 
 # load in raw cereal survey data tsv from "all cereal forms" export
-df_raw <- read_tsv(file.path("Setup documents", "QuickStatsExtract 680 All (11).tsv"))
+df_raw <- read_tsv(file.path("Setup documents", "QuickStatsExtract 680 All (12).tsv"))
 
 # Load in November sample for mailmerge ex FF
 full_data <- read_excel(file.path("Setup documents",
@@ -53,8 +53,6 @@ ch_data <- read_csv(file.path("Setup documents", "CH_data_final.csv")) %>%
   mutate(across(ends_with("_Production"), as.numeric),
          across(ends_with("_Area"), as.numeric),
          across(ends_with("_Yield"), as.numeric))
-
-str(ch_data)
 
 
 # Strings used when naming exports 

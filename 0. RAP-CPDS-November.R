@@ -24,8 +24,8 @@ for (s in Part1scripts) {
 
 #### Once decided which outliers to keep run:
 Finalised_removals <- read_excel(
-  file.path("November results",
-            "2025-26 - November - Production - Data - QA - Removals (FF, WC and yield Outliers) - 24 November 08-56.xlsx"))
+  file.path("QA files",
+            "2025-26 - Removals (FF, WC and yield Outliers) - FINAL.xlsx"))
 
 Part2scripts <- c(
   "6. CPDS-November-Production-Processing.R",

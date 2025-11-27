@@ -73,11 +73,11 @@ descriptive_stats_ITL225 <- Final_survey_results %>%
     range_area = max(Area, na.rm = TRUE) - min(Area, na.rm = TRUE),
     mean_area = mean(Area, na.rm = TRUE),
     sd_area = sd(Area, na.rm = TRUE),
-    min_production = min(Production, na.rm = TRUE),
-    max_production = max(Production, na.rm = TRUE),
-    range_production = max(Production, na.rm = TRUE) - min(Production, na.rm = TRUE),
-    mean_production = mean(Production, na.rm = TRUE),
-    sd_production = sd(Production, na.rm = TRUE),
+    min_production = min(adj_production, na.rm = TRUE),
+    max_production = max(adj_production, na.rm = TRUE),
+    range_production = max(adj_production, na.rm = TRUE) - min(adj_production, na.rm = TRUE),
+    mean_production = mean(adj_production, na.rm = TRUE),
+    sd_production = sd(adj_production, na.rm = TRUE),
     .groups = "drop"
   ) %>%
   mutate(CropGeneral = word(Crop, 1)) %>%
@@ -85,7 +85,7 @@ descriptive_stats_ITL225 <- Final_survey_results %>%
 
 
 descriptive_stats_Scotland <- Final_survey_results %>%
-  filter(!is.na(adj_yield), !is.na(Area), !is.na(Production)) %>%
+  filter(!is.na(adj_yield), !is.na(Area), !is.na(adj_production)) %>%
   group_by(Crop) %>%
   summarise(
     `Number of returns` = n(),
@@ -102,11 +102,11 @@ descriptive_stats_Scotland <- Final_survey_results %>%
     mean_area = mean(Area, na.rm = TRUE),
     sd_area = sd(Area, na.rm = TRUE),
     
-    min_production = min(Production, na.rm = TRUE),
-    max_production = max(Production, na.rm = TRUE),
-    range_production = max(Production, na.rm = TRUE) - min(Production, na.rm = TRUE),
-    mean_production = mean(Production, na.rm = TRUE),
-    sd_production = sd(Production, na.rm = TRUE),
+    min_production = min(adj_production, na.rm = TRUE),
+    max_production = max(adj_production, na.rm = TRUE),
+    range_production = max(adj_production, na.rm = TRUE) - min(adj_production, na.rm = TRUE),
+    mean_production = mean(adj_production, na.rm = TRUE),
+    sd_production = sd(adj_production, na.rm = TRUE),
     
     .groups = "drop"
   ) %>%
@@ -115,7 +115,7 @@ descriptive_stats_Scotland <- Final_survey_results %>%
   relocate(CropGeneral, .after = Crop)
 
 descriptive_stats_Scotland_GeneralCrop <- Final_survey_results %>%
-  filter(!is.na(adj_yield), !is.na(Area), !is.na(Production)) %>%
+  filter(!is.na(adj_yield), !is.na(Area), !is.na(adj_production)) %>%
   group_by(CropGeneral) %>%
   summarise(
     `Number of returns` = n(),
@@ -132,11 +132,11 @@ descriptive_stats_Scotland_GeneralCrop <- Final_survey_results %>%
     mean_area = mean(Area, na.rm = TRUE),
     sd_area = sd(Area, na.rm = TRUE),
     
-    min_production = min(Production, na.rm = TRUE),
-    max_production = max(Production, na.rm = TRUE),
-    range_production = max(Production, na.rm = TRUE) - min(Production, na.rm = TRUE),
-    mean_production = mean(Production, na.rm = TRUE),
-    sd_production = sd(Production, na.rm = TRUE),
+    min_production = min(adj_production, na.rm = TRUE),
+    max_production = max(adj_production, na.rm = TRUE),
+    range_production = max(adj_production, na.rm = TRUE) - min(adj_production, na.rm = TRUE),
+    mean_production = mean(adj_production, na.rm = TRUE),
+    sd_production = sd(adj_production, na.rm = TRUE),
     
     .groups = "drop"
   ) %>%
@@ -146,7 +146,7 @@ descriptive_stats_Scotland_GeneralCrop <- Final_survey_results %>%
 
 total_cereals_stats <- Final_survey_results %>%
   filter(CropGeneral %in% c("Wheat", "Barley", "Oats"),
-         !is.na(adj_yield), !is.na(Area), !is.na(Production)) %>%
+         !is.na(adj_yield), !is.na(Area), !is.na(adj_production)) %>%
   summarise(
     CropGeneral = "Total_cereals",
     `Number of returns` = n(),
@@ -160,11 +160,11 @@ total_cereals_stats <- Final_survey_results %>%
     range_area = max(Area, na.rm = TRUE) - min(Area, na.rm = TRUE),
     mean_area = mean(Area, na.rm = TRUE),
     sd_area = sd(Area, na.rm = TRUE),
-    min_production = min(Production, na.rm = TRUE),
-    max_production = max(Production, na.rm = TRUE),
-    range_production = max(Production, na.rm = TRUE) - min(Production, na.rm = TRUE),
-    mean_production = mean(Production, na.rm = TRUE),
-    sd_production = sd(Production, na.rm = TRUE)
+    min_production = min(adj_production, na.rm = TRUE),
+    max_production = max(adj_production, na.rm = TRUE),
+    range_production = max(adj_production, na.rm = TRUE) - min(adj_production, na.rm = TRUE),
+    mean_production = mean(adj_production, na.rm = TRUE),
+    sd_production = sd(adj_production, na.rm = TRUE)
   )%>%
   mutate(Crop = word(CropGeneral, 1),
          Region = "Scotland") %>%
@@ -191,12 +191,12 @@ descriptive_stats_combined <- bind_rows(
 
 ################################################################################
 Survey_results_ITL225 <- Final_survey_results %>%
-  filter(!is.na(Area), !is.na(Production)) %>%
+  filter(!is.na(Area), !is.na(adj_production)) %>%
   group_by(Crop, Region) %>%
   summarise(
     `Number of returns` = n(),
     survey_area = sum(Area, na.rm = TRUE),
-    total_production = sum(Production, na.rm = TRUE),
+    total_production = sum(adj_production, na.rm = TRUE),
     yield = total_production / survey_area,
     .groups = "drop"
   )%>%
@@ -204,12 +204,12 @@ Survey_results_ITL225 <- Final_survey_results %>%
 
 
 Survey_results_Scotland <- Final_survey_results %>%
-  filter(!is.na(Area), !is.na(Production)) %>%
+  filter(!is.na(Area), !is.na(adj_production)) %>%
   group_by(Crop) %>%
   summarise(
     `Number of returns` = n(),
     survey_area = sum(Area, na.rm = TRUE),
-    total_production = sum(Production, na.rm = TRUE),
+    total_production = sum(adj_production, na.rm = TRUE),
     yield = total_production / survey_area,
     .groups = "drop"
   )  %>%
@@ -218,12 +218,12 @@ Survey_results_Scotland <- Final_survey_results %>%
   mutate(CropGeneral = word(Crop, 1))
 
 Survey_results_Scotland_CropGeneral <- Final_survey_results %>%
-  filter(!is.na(Area), !is.na(Production)) %>%
+  filter(!is.na(Area), !is.na(adj_production)) %>%
   group_by(CropGeneral) %>%
   summarise(
     `Number of returns` = n(),
     survey_area = sum(Area, na.rm = TRUE),
-    total_production = sum(Production, na.rm = TRUE),
+    total_production = sum(adj_production, na.rm = TRUE),
     yield = total_production / survey_area,
     .groups = "drop"
   ) %>%
@@ -232,12 +232,12 @@ Survey_results_Scotland_CropGeneral <- Final_survey_results %>%
 
 total_cereals <- Final_survey_results %>%
   filter(CropGeneral %in% c("Wheat", "Barley", "Oats"),
-         !is.na(Area), !is.na(Production)) %>%
+         !is.na(Area), !is.na(adj_production)) %>%
   summarise(
     CropGeneral = "Total_cereals",
     `Number of returns` = n(),
     survey_area = sum(Area, na.rm = TRUE),
-    total_production = sum(Production, na.rm = TRUE),
+    total_production = sum(adj_production, na.rm = TRUE),
     yield = total_production / survey_area
   ) %>%
   mutate(Region = "Scotland") %>% 
@@ -465,9 +465,6 @@ target_crops_DEFRA <- c("Total_Wheat","Barley W", "Barley S", "Total_barley",
 DEFRA_export_table <- Final_results %>%
   filter(Region == "Scotland", Crop %in% target_crops_DEFRA) %>%
   mutate(
-    Yield = round(Yield, 1),
-    Production = round(Production, 0),
-    Area = round(Area, 0), 
     Crop = recode(Crop,                                     
                   "Total_Wheat" = "Wheat",
                   "Barley W"   = "Barley - Winter",

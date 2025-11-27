@@ -97,7 +97,7 @@ plot_yield_spread <- function(data, crop_filter = NULL, region_filter = NULL) {
   # Compute outliers + auto bounds
   filtered_data <- filtered_data %>%
     group_by(Crop, Region) %>%
-    arrange(Yield) %>%
+    arrange(adj_yield) %>%
     mutate(
       index = row_number(),
       Q1 = quantile(Yield, 0.25, na.rm = TRUE),
@@ -124,11 +124,11 @@ plot_yield_spread <- function(data, crop_filter = NULL, region_filter = NULL) {
   
   # Create title
   title_text <- glue(
-    "Yield Spread{if (!is.null(crop_filter)) paste0(': ', crop_filter) else ''}{if (!is.null(region_filter)) paste0(' - ', region_filter) else ''}"
+    "Adjusted Yield Spread{if (!is.null(crop_filter)) paste0(': ', crop_filter) else ''}{if (!is.null(region_filter)) paste0(' - ', region_filter) else ''}"
   )
   
   # ---- Build plot ----
-  p <- ggplot(filtered_data, aes(x = index, y = Yield, color = is_outlier)) +
+  p <- ggplot(filtered_data, aes(x = index, y = adj_yield, color = is_outlier)) +
     geom_point(size = 2, alpha = 0.7) +
     scale_color_manual(values = c("FALSE" = "#1f77b4", "TRUE" = "#d62728"), name = "Outlier") +
     
@@ -176,7 +176,7 @@ plot_yield_spread <- function(data, crop_filter = NULL, region_filter = NULL) {
   # Return outliers
   outlier_data <- filtered_data %>%
     filter(is_outlier) %>%
-    select(parish, holding, Crop, Region, Yield)
+    select(CPH,parish, holding, Crop, Region, Yield, adj_yield)
   
   return(outlier_data)
 }
@@ -197,10 +197,10 @@ all_outliers <- map2_dfr(
          `Final decision`="")
 
 combined_outliers <- QA_production_nov %>%
-  select(parish, holding, Crop, Region, Yield, reason, Wholecrop, `Final decision`) %>%
+  select(CPH, parish, holding, Crop, Region, Yield, adj_yield, reason, Wholecrop, `Final decision`) %>%
   bind_rows(
     all_outliers %>%
-      select(parish, holding, Crop, Region, Yield, Wholecrop, reason, `Final decision`)
+      select(CPH, parish, holding, Crop, Region, Yield, adj_yield, reason, Wholecrop, `Final decision`)
   ) %>%
   group_by(parish, holding, Crop, Region) %>%
   mutate(
@@ -209,12 +209,13 @@ combined_outliers <- QA_production_nov %>%
   ungroup()
 
 
+
 removals_FF_WC_Outliers <- removals_FF_WC %>%
   bind_rows(
-    combined_outliers %>%
-      select(parish, holding, Crop, Region, Wholecrop, reason, `Final decision`)
-  ) %>%
-  distinct(parish, holding, Crop, Region, .keep_all = TRUE)
+    Yield_QA_Log %>%
+      select(CPH, parish, holding, Region, Crop, Yield, adj_yield, reason, Wholecrop, `Final decision`)
+  )
+
 
 
 #export xlsx
@@ -233,4 +234,17 @@ write_xlsx(
   file.path("QA files", outputname_removals)
 )
 
-                  
+#export xlsx
+# filename appropriate for data upload to erdm
+str5 <- " - Removals (FF, WC and yield Outliers) - FINAL"
+outputname <- paste(
+  crop_year,
+  str5,
+  str7,
+  sep = ""
+)
+
+write_xlsx(
+  removals_FF_WC_Outliers,
+  file.path("QA files", outputname)
+)                  

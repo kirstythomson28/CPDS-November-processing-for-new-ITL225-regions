@@ -67,7 +67,7 @@ outputname4 <- paste(
 
 write.csv(
   Disposals_QA_with_issues,
-  file = file.path("QA charts", outputname4),
+  file = file.path("QA files", outputname4),
   row.names = FALSE
 )
 
