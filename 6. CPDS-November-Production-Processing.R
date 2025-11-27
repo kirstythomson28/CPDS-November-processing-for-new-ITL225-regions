@@ -539,3 +539,10 @@ Newest_year_CH_data <- Final_results %>%
 
 
 ch_data <- bind_rows(ch_data, Newest_year_CH_data)
+
+
+outputname4 <- "CH_data_final.csv"
+write_csv(
+  ch_data,
+  file.path("Setup documents", outputname4)
+)
