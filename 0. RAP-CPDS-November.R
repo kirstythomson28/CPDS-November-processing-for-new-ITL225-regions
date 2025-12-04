@@ -22,11 +22,11 @@ for (s in Part1scripts) {
   )
 }
 
-#### Once decided which outliers to keep run:
-Finalised_removals <- read_excel(
-  file.path("QA files",
-            "2025-26 - Removals (FF, WC and yield Outliers) - FINAL.xlsx"))
+## Update QA log with finalized decisions and read back in 
+Yield_QA_Log <- read_excel(file.path("Setup documents",
+                                     "2025-26 - November - Production - Data - QA - LOG.xlsx"))
 
+## Run final scripts 
 Part2scripts <- c(
   "6. CPDS-November-Production-Processing.R",
 # "7. CPDS-November-Production-Confidence Intervals.R",

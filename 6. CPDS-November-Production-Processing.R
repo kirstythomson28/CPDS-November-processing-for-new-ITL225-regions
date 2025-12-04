@@ -1,8 +1,44 @@
 ##Once QA is complete read back in yield_outliers_summary with Final Decision filled in manually for outliers
-## remove FF, wholecropped and outliers from data 
+removals_FF_WC_Outliers <- removals_FF_WC %>%
+  bind_rows(
+    Yield_QA_Log %>%
+      select(CPH, parish, holding, Region, Crop, Yield, adj_yield, reason, Wholecrop, `Final decision`)
+  )%>%
+  distinct(parish, holding,  Region, Crop, .keep_all = TRUE)
+
+#export xlsx
+# filename appropriate for data upload to erdm
+str5 <- " - Removals (FF, WC and yield Outliers) - "
+outputname_removals <- paste(
+  crop_year,
+  str5,
+  format(Sys.time(), "%d %B %H-%M"),
+  str7,
+  sep = ""
+)
+
+write_xlsx(
+  removals_FF_WC_Outliers,
+  file.path("QA files", outputname_removals)
+)
+
+#export xlsx
+# filename appropriate for data upload to erdm
+str5 <- " - Removals (FF, WC and yield Outliers) - FINAL"
+outputname <- paste(
+  crop_year,
+  str5,
+  str7,
+  sep = ""
+)
+
+write_xlsx(
+  removals_FF_WC_Outliers,
+  file.path("QA files", outputname)
+) 
 
 #Filter removals to only rows where decision == "REMOVE" 
-removals_yes <- Finalised_removals %>%
+removals_yes <- removals_FF_WC_Outliers %>%
   filter(`Final decision` == "remove")%>%
   select(parish, holding, Region, Crop, Wholecrop, reason, `Final decision`)
 
@@ -524,3 +560,7 @@ write_csv(
   ch_data,
   file.path("Setup documents", outputname4)
 )
+
+cereals_tiff_data_path <- "//s0196a/ADM-Rural and Environmental Science-Farming Statistics/Agriculture/Source/TIFF/Cereals/"
+file_path <- paste0(cereals_tiff_data_path, "CH_data_final.csv")
+write.csv(ch_data, file = file_path, row.names = FALSE)

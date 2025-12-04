@@ -9,7 +9,7 @@ library(glue)
 library(tidyr)
 
 # Define the folders you want
-folders <- c("Setup documents", "Mail merge","November results", "QA files", "Publication charts")
+folders <- c("Setup documents", "Mail merge","November results", "QA files", "Publication charts", "July sample")
 
 # Create them if they don't exist
 for (f in folders) {
@@ -27,7 +27,7 @@ Sample <- read_csv(file.path("Setup documents",
                              "Main_sample_2025 - Excludes test farms.csv"))
 
 # load in raw cereal survey data tsv from "all cereal forms" export
-df_raw <- read_tsv(file.path("Setup documents", "QuickStatsExtract 680 All (12).tsv"))
+df_raw <- read_tsv(file.path("Setup documents", "QuickStatsExtract 680 All (13).tsv"))
 
 # Load in November sample for mailmerge ex FF
 full_data <- read_excel(file.path("Setup documents",

@@ -253,33 +253,4 @@ removals_FF_WC_Outliers <- removals_FF_WC %>%
   )%>%
   distinct(parish, holding,  Region, Crop, .keep_all = TRUE)
 
-#export xlsx
-# filename appropriate for data upload to erdm
-str5 <- " - Removals (FF, WC and yield Outliers) - "
-outputname_removals <- paste(
-  crop_year,
-  str5,
-  format(Sys.time(), "%d %B %H-%M"),
-  str7,
-  sep = ""
-)
-
-write_xlsx(
-  removals_FF_WC_Outliers,
-  file.path("QA files", outputname_removals)
-)
-
-#export xlsx
-# filename appropriate for data upload to erdm
-str5 <- " - Removals (FF, WC and yield Outliers) - FINAL"
-outputname <- paste(
-  crop_year,
-  str5,
-  str7,
-  sep = ""
-)
-
-write_xlsx(
-  removals_FF_WC_Outliers,
-  file.path("QA files", outputname)
-)                  
+                 
