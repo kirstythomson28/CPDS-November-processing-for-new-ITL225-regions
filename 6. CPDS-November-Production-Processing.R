@@ -552,8 +552,11 @@ Newest_year_CH_data <- Final_results %>%
          across(ends_with("_Yield"), as.numeric))
 
 
-ch_data <- bind_rows(ch_data, Newest_year_CH_data)
-
+ch_data <- ch_data %>%
+  # drop any rows whose Year is in Newest_year_CH_data
+  filter(!Year %in% Newest_year_CH_data$Year) %>%
+  # then add the new rows
+  bind_rows(Newest_year_CH_data)
 
 outputname4 <- "CH_data_final.csv"
 write_csv(

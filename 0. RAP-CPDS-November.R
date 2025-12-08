@@ -30,9 +30,8 @@ Yield_QA_Log <- read_excel(file.path("Setup documents",
 Part2scripts <- c(
   "6. CPDS-November-Production-Processing.R",
 # "7. CPDS-November-Production-Confidence Intervals.R",
-  "8. CPDS Final Estimates Production Plots.R"
-# ,
-# "9. CPDS-November-Selecting June sample.R"
+  "8. CPDS Final Estimates Production Plots.R",
+  "9. CPDS-November-Selecting June sample.R"
 )
 
 # Run them all with logging

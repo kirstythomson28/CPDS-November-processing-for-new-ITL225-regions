@@ -1,20 +1,18 @@
 ####### Selecting Sample for July ########
-data <- combined_df
-
 removals_cph <- removals_FF_WC_Outliers %>% 
   filter(`Final decision` == "remove")%>%
   distinct(CPH, .keep_all = TRUE)
 
-data <- data %>%
+data <- combined_df %>%
   filter(!CPH %in% removals_cph$CPH)%>% #Remove any row if CPH is in removed cph
   filter(Crop != "OSRape") #Remove OSRape
 
 #Remove any where no crop is left
-data <- data %>%
+data_filtered <- data %>%
   filter(Opening_stock_Oct != "0")%>%
   filter(Closing_Stock_Oct != "0")
 
-July_Sample <- data %>%  
+July_Sample <- data_filtered %>%  
   select(CPH, parish, holding) %>%      
   distinct(CPH, .keep_all = TRUE) 
 
@@ -33,16 +31,16 @@ mail_merge_wide <- mail_merge %>%
     names_from = location_num,
     values_from = CPH,
     names_prefix = "location")
-    
-
 
 July_Sample <- July_Sample %>%
   select(-CPH)
 
 colnames(July_Sample) <- NULL
 
+
 # Filename appropriate for data upload to ERDM
 str6 <- " - November - Data - Formatted data output for july sample - location only - "
+str3 <- ".csv"
 outputname4 <- paste(
   crop_year,
   str6,
