@@ -204,6 +204,8 @@ joined_all <- joined_all %>%
 #export xlsx
 #filename appropriate for data upload to erdm
 str2 <- " - Formatted Nov production data output (FF & WhCr removed) - "
+str7 <- ".xlsx"
+
 outputname2 <- paste(
   crop_year,
   str2,
@@ -211,9 +213,11 @@ outputname2 <- paste(
   str7,
   sep = ""
 )
-write_xlsx(joined_all,
-           file.path("November results", outputname2))
 
+write_xlsx(
+  joined_all,
+  file.path("November results", outputname2)
+)
 ################################################################################
 ####################### November DISPOSALS #####################################
 ################################################################################
@@ -340,6 +344,7 @@ head(Disposals_Crop)
 #export csv
 # filename appropriate for data upload to erdm
 str4 <- " - Formatted Nov disposals data output - "
+str3 <- ".csv"
 outputname2 <- paste(
   crop_year,
   str4,
@@ -355,17 +360,22 @@ write.csv(
   row.names = FALSE
 )
 
-#export csv
+#export xlsx
 # filename appropriate for data upload to erdm
 str5 <- " - Formatted Nov production and disposals data - "
+str7 <- ".xlsx"
+
 outputname3 <- paste(
   crop_year,
   str5,
   format(Sys.Date(), "%d %B"),
-  str3,
+  str7,
   sep = ""
 )
-write.csv(
+
+write_xlsx(
   combined_df,
-  file = file.path("November results", outputname3), 
-  row.names = FALSE)
+  path = file.path("November results", outputname3)
+)
+
+
